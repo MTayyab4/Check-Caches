@@ -6,8 +6,7 @@ const cacheAssets = [
     'main.js'
 ];
 
-
-// Call Install, Event
+// Call Install Event
 self.addEventListener('install', e => {
     console.log('Service Worker: Installed');
 
@@ -15,24 +14,25 @@ self.addEventListener('install', e => {
         caches.open(cacheName)
             .then(cache => {
                 console.log("Service Worker: Caching Files");
-                cache.addAll(cacheAssets)
+                return cache.addAll(cacheAssets); // Added return statement
             })
-        // Add all core files to the cache during
-        // the install event
-    )
+    );
 });
+
 // Call Activate Event
 self.addEventListener('activate', e => {
     console.log('Service Worker: Activated');
     // Remove unwanted caches
-    caches.keys().then(keyList => {
-        return Promise.all(
-            cacheName.map(cache => {
-                if (cache !== cacheName) {
-                    console.log("service worker : clearing cache");
-                    return caches.delete(cache);
-                }
-            })
-        )
-    })
+    e.waitUntil(
+        caches.keys().then(keyList => {
+            return Promise.all(
+                keyList.map(cache => {
+                    if (cache !== cacheName) {
+                        console.log("Service Worker: Clearing old cache");
+                        return caches.delete(cache);
+                    }
+                })
+            );
+        })
+    );
 });
