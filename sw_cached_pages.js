@@ -1,4 +1,4 @@
-const cacheName = 'apun ka cache';
+const cacheName = 'v1';
 
 const cacheAssets = [
     'index.html',
@@ -16,6 +16,7 @@ self.addEventListener('install', e => {
                 console.log("Service Worker: Caching Files");
                 return cache.addAll(cacheAssets); // Added return statement
             })
+            .then(() => self.skipWaiting())
     );
 });
 
@@ -36,3 +37,10 @@ self.addEventListener('activate', e => {
         })
     );
 });
+
+self.addEventListener('fetch', e => {
+    console.log('service worker : fetcheing');
+    e.respondWith(fetch(e.request).catch(() => caches.match(e.request)));
+
+
+})
